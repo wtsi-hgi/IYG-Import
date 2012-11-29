@@ -4,7 +4,7 @@ A Python script to import data to an IYG Web MySQL database.
 
 ##Requirements
 * <a href="http://sourceforge.net/projects/mysql-python/">MySQLdb</a> (apt-get install python-mysqldb)
-* IYG Web <a href="https://github.com/SamStudio8/IYG-Web/blob/master/iyg.sql">iyg.sql</a> structure deployed to a MySQL instance
+* IYG Web <a href="https://github.com/wtsi-hgi/IYG-Web/blob/master/iyg.sql">iyg.sql</a> structure deployed to a MySQL instance
 
 ##Usage
 `./import.py db_user barcodes snps trait_variants results [--host] [--name] [-h]`
