@@ -1,6 +1,6 @@
 #IYG Import
 A Python script to import data to an IYG Web MySQL database.
-<br />IYG Web can be found at <a href="https://github.com/SamStudio8/IYG-Web.git">IYG Web</a>.
+<br />IYG Web can be found at <a href="https://github.com/wtsi-hgi/IYG-Web.git">IYG Web</a>.
 
 ##Requirements
 * <a href="http://sourceforge.net/projects/mysql-python/">MySQLdb</a> (apt-get install python-mysqldb)
