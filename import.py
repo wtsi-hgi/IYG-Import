@@ -348,7 +348,7 @@ class Data_Loader:
         
         lineno = 1
         for row in results:
-            fields = row.strip().split(" \t")
+            fields = row.strip().split(" ")
 
             # get the user this row corresponds to
             current_barcode = fields[1].strip()
