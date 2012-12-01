@@ -304,6 +304,8 @@ class Data_Loader:
                 print ("[WARN]\tGenotype %s for SNP %s not found in SNP import" 
                     % (call, current_snp_rs))
                 continue
+            # unknown confidence
+            confidence = 101
         
             #Update the count for this variant
             if variant_dbid not in popcounts:
@@ -335,7 +337,7 @@ class Data_Loader:
             'snps': [],
             'barcodes': []}
         
-        header_names = results.readline().strip().split(" \t")[5:] #parse the header information
+        header_names = results.readline().strip().split(" ")[5:] #parse the header information
 
         for current_snp_rs in header_names:
             if current_snp_rs not in snps:
@@ -364,6 +366,7 @@ class Data_Loader:
             # now parse the SNPs
             for snp_pos in range(0,len(header_names)):
                 current_snp_rs = header_names[snp_pos]
+                
                 if current_snp_rs not in snps:
                     continue
                 
