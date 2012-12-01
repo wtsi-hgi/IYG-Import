@@ -31,11 +31,11 @@ class Data_Loader:
 
     def __init__(self, args):
         """Initialise the Database Connection and Cursor, call Execute"""
-        self.db = self.connect(args.user, args.host, args.name)
+        self.db = self.connect(args.user, args.host, args.port, args.name)
         self.cur = self.db.cursor()
         self.execute(args)
 
-    def connect(self, user, host, name):
+    def connect(self, user, host, port, name):
         """Attempts to connect to the database with the user, host and name
         parameters and prompts for the password."""
 
@@ -45,6 +45,7 @@ class Data_Loader:
                 user=user,
                 passwd=password,
                 host=host,
+                port=port,
                 db=name)
         except MySQLdb.OperationalError, e:
             print "[FAIL]\tUnable to Establish Database Connection"
@@ -426,6 +427,8 @@ if __name__ == "__main__":
         "Import genotyping data to an Inside your Genome Database"))
     parser.add_argument('--host', metavar="", default="127.0.0.1",
         help=("Database Host [default: 127.0.0.1]"))
+    parser.add_argument('--port', type=int, metavar="", default="3380",
+        help=("Database Port [default: 3390]"))
     parser.add_argument('--name', metavar="", default="iyg",
         help=("Database Name [default: iyg]"))
     parser.add_argument('user', metavar="user",
