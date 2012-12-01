@@ -406,8 +406,7 @@ def import_results(self, results, users, snps):
         frequency for each variant at each SNP site and update the database"""
 
         for snp in snps:
-            snp_variants = ({k:popcounts[k] for k in 
-                snps[snp]['genotypes'].values() if k in popcounts})
+            snp_variants = dict(((k,popcounts[k]) for k in snps[snp]['genotypes'].values() if k in popcounts))
             total = sum(snp_variants.values())
 
             for v in snp_variants:
