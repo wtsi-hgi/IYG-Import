@@ -59,14 +59,16 @@ class Data_Loader:
         barcodes_file = open(args.barcodes, 'r')
         snps_file = open(args.snps, 'r')
         trait_variants_file = open(args.trait_variants, 'r')
-        results_file = open(args.results, 'r')
+        results_map_file = open(args.results.join('.map'), 'r')
+        results_ped_file = open(args.results.join('.ped'), 'r')
+
 
         self.purge_db()
 
         users = self.import_profiles(barcodes_file)
         snps = self.import_snps(snps_file)
         self.import_trait_variants(trait_variants_file, snps)
-        self.import_results(results_file, users, snps)
+        self.import_results(results_map_file, results_ped_file, users, snps)
 
         self.db.close()
 
@@ -327,7 +329,7 @@ class Data_Loader:
         results.close()
         self.update_popfreqs(snps, popcounts)
 
-    def import_results(self, results, users, snps):
+    def import_results(self, map_data, results, users, snps):
         """Process the CSV of genotype call results, adding a new result record
             for each row with a valid call"""
         print "[READ]\tImporting Results File (PED)"
@@ -337,7 +339,11 @@ class Data_Loader:
             'snps': [],
             'barcodes': []}
         
-        header_names = results.readline().strip().split(" ")[5:] #parse the header information
+        #parse the header information
+        header_names = []
+        for header_item in map_data:
+            snp = header.strip().split(" ");
+            header_names.append(snp[2])
 
         for current_snp_rs in header_names:
             if current_snp_rs not in snps:
