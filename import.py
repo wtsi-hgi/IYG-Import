@@ -59,8 +59,8 @@ class Data_Loader:
         barcodes_file = open(args.barcodes, 'r')
         snps_file = open(args.snps, 'r')
         trait_variants_file = open(args.trait_variants, 'r')
-        results_map_file = open(args.results.join('.map'), 'r')
-        results_ped_file = open(args.results.join('.ped'), 'r')
+        results_map_file = open(args.results + '.map', 'r')
+        results_ped_file = open(args.results + '.ped', 'r')
 
 
         self.purge_db()
@@ -342,8 +342,8 @@ class Data_Loader:
         #parse the header information
         header_names = []
         for header_item in map_data:
-            snp = header.strip().split(" ");
-            header_names.append(snp[2])
+            snp = header_item.strip().split("\t");
+            header_names.append(snp[1])
 
         for current_snp_rs in header_names:
             if current_snp_rs not in snps:
@@ -376,9 +376,9 @@ class Data_Loader:
                 if current_snp_rs not in snps:
                     continue
                 
-                call = ''.join(fields[6+snp_pos*2]).join(fields[6+snp_pos*2+1])
+                call = fields[6+snp_pos*2]+fields[6+snp_pos*2+1]
                 
-                if call == "":
+                if call == "00":
                     continue
                 
                 # Check the call for this SNP was imported
@@ -399,8 +399,8 @@ class Data_Loader:
                 
                 try:
                     self.cur.execute(
-                                     "INSERT INTO results (profile_id, variant_id) "
-                                     "VALUES (%s, %s)", (profile_dbid, variant_dbid))
+                                     "INSERT INTO results (profile_id, variant_id, confidence) "
+                                     "VALUES (%s, %s, 101)", (profile_dbid, variant_dbid))
                     self.db.commit()
                 except MySQLdb.Error, e:
                     print "[FAIL]\tResult at Line# %s not added to database" % lineno
