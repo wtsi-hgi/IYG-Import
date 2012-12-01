@@ -324,82 +324,82 @@ class Data_Loader:
         results.close()
         self.update_popfreqs(snps, popcounts)
 
-def import_results(self, results, users, snps):
-    """Process the CSV of genotype call results, adding a new result record
-        for each row with a valid call"""
-    print "[READ]\tImporting Results File (PED)"
-    
-    popcounts = {} # Store counts for each detected variant
-    errors = { # Used to suppress repeating errors
-        'snps': [],
-        'barcodes': []}
-    
-    header_names = results.readline().strip().split(" \t")[5:] #parse the header information
-
-    for current_snp_rs in header_names:
-        if current_snp_rs not in snps:
-            if current_snp_rs not in errors['snps']:
-                print ("[WARN]\tSNP %s not found in SNP import" 
-                       % (current_snp_rs))
-                errors['snps'].append(current_snp_rs)
-            continue
-
-    
-    lineno = 1
-    for row in results:
-        fields = row.strip().split(" \t")
-
-        # get the user this row corresponds to
-        current_barcode = fields[1].strip()
-        if current_barcode not in users:
-            if current_barcode not in errors['barcodes']:
-                print ("[WARN]\tBarcode# %s not found in profile import" 
-                       % (current_barcode))
-                errors['barcodes'].append(current_barcode)
-            continue
-        else:
-            profile_dbid = users[current_barcode]
+    def import_results(self, results, users, snps):
+        """Process the CSV of genotype call results, adding a new result record
+            for each row with a valid call"""
+        print "[READ]\tImporting Results File (PED)"
         
-        # now parse the SNPs
-        for snp_pos in range(0,len(header_names)):
-            current_snp_rs = header_names[snp_pos]
+        popcounts = {} # Store counts for each detected variant
+        errors = { # Used to suppress repeating errors
+            'snps': [],
+            'barcodes': []}
+        
+        header_names = results.readline().strip().split(" \t")[5:] #parse the header information
+
+        for current_snp_rs in header_names:
             if current_snp_rs not in snps:
+                if current_snp_rs not in errors['snps']:
+                    print ("[WARN]\tSNP %s not found in SNP import" 
+                           % (current_snp_rs))
+                    errors['snps'].append(current_snp_rs)
                 continue
-            
-            call = ''.join(fields[6+snp_pos*2]).join(fields[6+snp_pos*2+1])
-            
-            if call == "":
-                continue
-            
-            # Check the call for this SNP was imported
-            if call in snps[current_snp_rs]['genotypes']:
-                variant_dbid = snps[current_snp_rs]['genotypes'][call]
-            elif call[::-1] in snps[current_snp_rs]['genotypes']:
-                variant_dbid = snps[current_snp_rs]['genotypes'][call[::-1]]
-            else:
-                print ("[WARN]\tGenotype %s for SNP %s not found in SNP import" 
-                       % (call, current_snp_rs))
-                continue
-            
-            #Update the count for this variant
-            if variant_dbid not in popcounts:
-                popcounts[variant_dbid] = 1
-            else:
-                popcounts[variant_dbid] += 1
-            
-            try:
-                self.cur.execute(
-                                 "INSERT INTO results (profile_id, variant_id) "
-                                 "VALUES (%s, %s)", (profile_dbid, variant_dbid))
-                self.db.commit()
-            except MySQLdb.Error, e:
-                print "[FAIL]\tResult at Line# %s not added to database" % lineno
-                print "\tError %d: %s" % (e.args[0], e.args[1])
+
         
-        lineno += 1
-    
-    results.close()
-    self.update_popfreqs(snps, popcounts)
+        lineno = 1
+        for row in results:
+            fields = row.strip().split(" \t")
+
+            # get the user this row corresponds to
+            current_barcode = fields[1].strip()
+            if current_barcode not in users:
+                if current_barcode not in errors['barcodes']:
+                    print ("[WARN]\tBarcode# %s not found in profile import" 
+                           % (current_barcode))
+                    errors['barcodes'].append(current_barcode)
+                continue
+            else:
+                profile_dbid = users[current_barcode]
+            
+            # now parse the SNPs
+            for snp_pos in range(0,len(header_names)):
+                current_snp_rs = header_names[snp_pos]
+                if current_snp_rs not in snps:
+                    continue
+                
+                call = ''.join(fields[6+snp_pos*2]).join(fields[6+snp_pos*2+1])
+                
+                if call == "":
+                    continue
+                
+                # Check the call for this SNP was imported
+                if call in snps[current_snp_rs]['genotypes']:
+                    variant_dbid = snps[current_snp_rs]['genotypes'][call]
+                elif call[::-1] in snps[current_snp_rs]['genotypes']:
+                    variant_dbid = snps[current_snp_rs]['genotypes'][call[::-1]]
+                else:
+                    print ("[WARN]\tGenotype %s for SNP %s not found in SNP import" 
+                           % (call, current_snp_rs))
+                    continue
+                
+                #Update the count for this variant
+                if variant_dbid not in popcounts:
+                    popcounts[variant_dbid] = 1
+                else:
+                    popcounts[variant_dbid] += 1
+                
+                try:
+                    self.cur.execute(
+                                     "INSERT INTO results (profile_id, variant_id) "
+                                     "VALUES (%s, %s)", (profile_dbid, variant_dbid))
+                    self.db.commit()
+                except MySQLdb.Error, e:
+                    print "[FAIL]\tResult at Line# %s not added to database" % lineno
+                    print "\tError %d: %s" % (e.args[0], e.args[1])
+            
+            lineno += 1
+        
+        results.close()
+        self.update_popfreqs(snps, popcounts)
 
     def update_popfreqs(self, snps, popcounts):
         """Using the counters from the results import, calculate the population
